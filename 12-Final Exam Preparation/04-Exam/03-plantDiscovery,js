@@ -1,0 +1,80 @@
+function plantDiscovery(input) {
+    let num = input.shift();
+    let plants = {};
+
+    for (let i = 0; i < num; i++) {
+        let [plant, rarity] = input.shift().split('<->');
+
+        plants[plant] = { rarity: Number(rarity) };
+    }
+
+    let line = input.shift();
+
+    while (line !== "Exhibition") {
+        let [command, ...tokens] = line.split(": ");
+
+        if (command === "Rate") {
+            let [plant, rating] = tokens[0].split(" - ");
+            rating = Number(rating);
+
+            if (!plants.hasOwnProperty(plant)) {
+                console.log('error');
+            } else {
+                if (!plants[plant].hasOwnProperty("ratings")) {
+                    plants[plant].ratings = [];
+                }
+
+                plants[plant].ratings.push(rating);
+            }
+        } else if (command === "Update") {
+            let [plant, newRarity] = tokens[0].split(" - ");
+            newRarity = Number(newRarity);
+
+            if (!plants.hasOwnProperty(plant)) {
+                console.log('error');
+            } else {
+                plants[plant].rarity = newRarity;
+            }
+        } else if (command === "Reset") {
+            let plant = tokens[0];
+
+            if (!plants.hasOwnProperty(plant)) {
+                console.log('error');
+            } else {
+                delete plants[plant].ratings;
+            }
+        }
+
+        line = input.shift();
+    }
+
+    console.log("Plants for the exhibition:");
+
+    for (let [key, value] of Object.entries(plants)) {
+        let counter = 0;
+        let averageRating = 0;
+
+        if (value.hasOwnProperty("ratings")) {
+            let sum = value.ratings.reduce((acc, el) => {
+                counter++;
+                return acc + el;
+            }, 0)
+            averageRating = sum / counter;
+        } else {
+            averageRating = 0;
+        }
+
+        console.log(`- ${key}; Rarity: ${value.rarity}; Rating: ${averageRating.toFixed(2)}`);
+    }
+}
+plantDiscovery(["2",
+    "Candelabra<->10",
+    "Oahu<->10",
+    "Rate: Oahu - 7",
+    "Rate: Candelabra - 6",
+    "Exhibition"
+]);
+
+
+
+
